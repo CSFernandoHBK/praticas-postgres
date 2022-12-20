@@ -1,0 +1,88 @@
+CREATE TABLE "customers" (
+	"id" SERIAL PRIMARY KEY,
+	"fullName" VARCHAR(120) NOT NULL,
+	"cpf" VARCHAR(11) UNIQUE NOT NULL,
+	"email" VARCHAR(100) UNIQUE NOT NULL,
+	"password" VARCHAR(100) NOT NULL
+)
+
+CREATE TABLE "bankAccount"(
+	"id" SERIAL PRIMARY KEY,
+	"customerId" INTEGER NOT NULL,
+	"accountNumber" INTEGER UNIQUE NOT NULL,
+	"agency" INTEGER UNIQUE NOT NULL,
+	"openDate" DATE NOT NULL,
+	"closeDate" DATE
+)
+
+CREATE TYPE type AS ENUM ('deposit', 'withdraw')
+
+CREATE TABLE "transactions"(
+	"id" SERIAL PRIMARY KEY,
+	"bankAccountId" INTEGER NOT NULL,
+	"amount" INTEGER NOT NULL,
+	"type" type,
+	"time" DATE NOT NULL,
+	"description" TEXT NOT NULL,
+	"cancelled" BOOL NOT NULL
+)
+
+CREATE TABLE "creditCards"(
+	"id" SERIAL PRIMARY KEY,
+	"bankAccountId" INTEGER NOT NULL,
+	"name" TEXT NOT NULL,
+	"number" INTEGER UNIQUE NOT NULL,
+	"securityCode" INTEGER NOT NULL,
+	"expirationMonth" INTEGER NOT NULL,
+	"expirationYear" INTEGER NOT NULL,
+	"password" TEXT NOT NULL,
+	"limit" INTEGER NOT NULL
+)
+
+CREATE TABLE "customerAddresses"(
+	"id" SERIAL PRIMARY KEY,
+	"customerId" INTEGER NOT NULL,
+	"street" TEXT NOT NULL,
+	"number" TEXT NOT NULL,
+	"complement" TEXT NOT NULL,
+	"postalCode" TEXT NOT NULL,
+	"cityId" INTEGER NOT NULL
+)
+
+CREATE TYPE typep AS ENUM ('landline', 'mobile')
+
+CREATE TABLE "customerPhones"(
+	"id" SERIAL PRIMARY KEY,
+	"customerId" INTEGER NOT NULL,
+	"number" INTEGER UNIQUE NOT NULL,
+	"type" typep
+)
+
+CREATE TABLE "states"(
+	"id" SERIAL PRIMARY KEY,
+	"name" VARCHAR(100) NOT NULL
+)
+
+CREATE TABLE "cities"(
+	"id" SERIAL PRIMARY KEY,
+	"name" VARCHAR(100),
+	"stateId" INTEGER NOT NULL
+)
+
+ALTER TABLE "customerPhones" ADD CONSTRAINT "phones_fk0" FOREIGN KEY ("customerId") REFERENCES "customers"("id");
+
+ALTER TABLE "customerAddresses" ADD CONSTRAINT "adresses_fk0" FOREIGN KEY ("customerId") REFERENCES "customers"("id");
+ALTER TABLE "customerAddresses" ADD CONSTRAINT "adresses_fk1" FOREIGN KEY ("cityId") REFERENCES "cities"("id");
+
+ALTER TABLE "cities" ADD CONSTRAINT "cities_fk0" FOREIGN KEY ("stateId") REFERENCES "states"("id");
+
+ALTER TABLE "bankAccount" ADD CONSTRAINT "bank_fk0" FOREIGN KEY ("customerId") REFERENCES "customers"("id");
+
+ALTER TABLE "transactions" ADD CONSTRAINT "transactions_fk0" FOREIGN KEY ("bankAccountId") REFERENCES "bankAccount"("id");
+
+ALTER TABLE "creditCards" ADD CONSTRAINT "cards_fk0" FOREIGN KEY ("bankAccountId") REFERENCES "bankAccount"("id");
+
+
+
+
+
